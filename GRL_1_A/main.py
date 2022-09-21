@@ -1,38 +1,32 @@
-from re import S
-
-
-# V: 頂点数
-# g[v] = {(w, cost)}:
-#     頂点vから遷移可能な頂点(w)とそのコスト(cost)
-# r: 始点の頂点
- 
 from heapq import heappush, heappop
-INF = 10**10
-def dijkstra(N, G, s):
-    dist = [INF] * N
-    que = [(0, s)]
+INF = float("inf")
+def dijkstra(s, n): # (始点, ノード数)
+    dist = [INF] * n # 始点からの距離の初期化
+    hq = [(0, s)] # (distance, node)
     dist[s] = 0
-    while que:
-        c, v = heappop(que)
-        if dist[v] < c:
-            continue
-        for t, cost in G[v]:
-            if dist[v] + cost < dist[t]:
-                dist[t] = dist[v] + cost
-                heappush(que, (dist[t], t))
+    seen = [False] * n # ノードが確定済みかどうか
+    while hq:
+        v = heappop(hq)[1] # ノードを pop する
+        seen[v] = True
+        for to, cost in adj[v]: # ノード v に隣接しているノードに対して
+            if seen[to] == False and dist[v] + cost < dist[to]:
+                dist[to] = dist[v] + cost
+                heappush(hq, (dist[to], to))
     return dist
 
-v,e,r = map(int,input().split())
-std = [list(map(int,input().split())) for _ in range(v)]
+# ノード数, エッジ数, 始点ノード
+v, e, r = map(int, input().split())
+# adj[s]: ノード s に隣接する(ノード, 重み)をリストで持つ
+adj = [[] for _ in range(v)]
+for i in range(e):
+    s, t, d = map(int, input().split())
+    adj[s].append((t, d))
+D = dijkstra(r, v)
 
-V = [[]]*v
-for s,t,d in std:
-    V[s].append([t,d])
-X = dijkstra(v,V,r)
-ans = 0
-for x in X:
-    ans += x
-    if x > 10**9:
+for d in D:
+    if d == INF:
         print("INF")
-        continue
-    print(ans)
+    else:
+        print(d)
+
+
